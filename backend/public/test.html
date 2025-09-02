@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Expense API Quick Test</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --pink:#ff4dac; --yellow:#ffd166; --blue:#5ab0ff; --green:#27c07d;
+      --bg:#fff7fb; --text:#222; --card:#ffffff;
+    }
+    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px;}
+    h1{margin:0 0 8px}
+    .muted{color:#666;margin-bottom:18px}
+    .row{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-bottom:16px}
+    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    label{font-size:12px;color:#444}
+    input,select{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:6px}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{border:0;border-radius:999px;padding:10px 14px;color:white;font-weight:600;cursor:pointer}
+    .pink{background:var(--pink)} .yellow{background:var(--yellow);color:#222}
+    .blue{background:var(--blue)} .green{background:var(--green)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+    .badge{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700}
+    .b-pink{background:var(--pink);color:#fff}.b-yellow{background:var(--yellow)}
+    .b-blue{background:var(--blue);color:#fff}.b-green{background:var(--green);color:#fff}
+    .idbox{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; background:#f6f6f6; padding:6px 8px; border-radius:8px}
+  </style>
+</head>
+<body>
+  <h1>Expense API Quick Test</h1>
+  <div class="muted">Teste rápido dos endpoints <code>/api/expenses</code>, sem Postman.</div>
+
+  <div class="row">
+    <div class="card">
+      <h3>Dados</h3>
+      <label>Descrição
+        <input id="desc" placeholder="Ex: Lunch" />
+      </label>
+      <label style="margin-top:8px;">Categoria
+        <select id="cat">
+          <option>Food</option><option>Transport</option>
+          <option>Shopping</option><option>Health</option>
+          <option>Bills</option><option>Other</option>
+        </select>
+      </label>
+      <label style="margin-top:8px;">Valor
+        <input id="amount" type="number" step="0.01" placeholder="Ex: 12.50" />
+      </label>
+      <label style="margin-top:8px;">Data
+        <input id="date" type="date" />
+      </label>
+      <label style="margin-top:8px;">Pagamento
+        <input id="payment" placeholder="Cash / Card / PIX" />
+      </label>
+      <div class="btns">
+        <button class="green" onclick="createExpense()">Criar</button>
+        <button class="blue" onclick="loadAll()">Carregar lista</button>
+        <button class="yellow" onclick="seed()">Seed (exemplos)</button>
+        <button class="pink" onclick="clearDb()">Clear</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Atualizar / Deletar</h3>
+      <div style="margin-bottom:8px;">ID selecionado:</div>
+      <div id="selId" class="idbox">—</div>
+      <div class="btns">
+        <button class="yellow" onclick="updateSelected()">Atualizar</button>
+        <button class="pink" onclick="deleteSelected()">Deletar</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Clique em uma linha na tabela para selecionar o ID</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Lista</h3>
+    <table id="tbl">
+      <thead>
+        <tr><th>ID</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Data</th><th>Pgto</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+const base = location.origin + "/api/expenses";
+let selectedId = null;
+document.getElementById("date").valueAsDate = new Date();
+
+function badge(cat){
+  const map = {Food:'b-pink',Transport:'b-blue',Shopping:'b-yellow',Health:'b-green',Bills:'b-blue',Other:'b-yellow'};
+  const cls = map[cat] || 'b-yellow';
+  return `<span class="badge ${cls}">${cat}</span>`;
+}
+
+async function loadAll(){
+  const res = await fetch(base);
+  const data = await res.json();
+  const tbody = document.querySelector("#tbl tbody");
+  tbody.innerHTML = "";
+  data.forEach(x=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="idbox">${x._id}</span></td>
+      <td>${x.description}</td>
+      <td>${badge(x.category)}</td>
+      <td>$ ${Number(x.amount).toFixed(2)}</td>
+      <td>${new Date(x.date).toLocaleDateString()}</td>
+      <td>${x.payment||""}</td>`;
+    tr.onclick = ()=>{ selectedId = x._id; document.getElementById("selId").textContent = selectedId; };
+    tbody.appendChild(tr);
+  });
+}
+
+async function createExpense(){
+  const body = {
+    description: document.getElementById("desc").value.trim(),
+    category: document.getElementById("cat").value,
+    amount: Number(document.getElementById("amount").value),
+    date: document.getElementById("date").value,
+    payment: document.getElementById("payment").value.trim()
+  };
+  if(!body.description || !body.amount || !body.date){ alert("Preencha descrição, valor e data."); return; }
+  await fetch(base, {method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  await loadAll();
+}
+
+async function updateSelected(){
+  if(!selectedId) return alert("Selecione uma linha da tabela.");
+  const body = {
+    description: document.getElementById("desc").value.trim(),
+    category: document.getElementById("cat").value,
+    amount: Number(document.getElementById("amount").value),
+    date: document.getElementById("date").value,
+    payment: document.getElementById("payment").value.trim()
+  };
+  await fetch(`${base}/${selectedId}`, {method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  await loadAll();
+}
+
+async function deleteSelected(){
+  if(!selectedId) return alert("Selecione uma linha da tabela.");
+  await fetch(`${base}/${selectedId}`, {method:"DELETE"});
+  selectedId = null;
+  document.getElementById("selId").textContent = "—";
+  await loadAll();
+}
+
+async function seed(){
+  await fetch(location.origin + "/api/dev/seed", {method:"POST"});
+  await loadAll();
+}
+async function clearDb(){
+  await fetch(location.origin + "/api/dev/clear", {method:"POST"});
+  await loadAll();
+}
+
+loadAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+:root{
+  --pink:#ffd9e6;
+  --pink-strong:#ff5aa7;
+  --yellow:#ffd24d;
+  --green:#8be0be;
+  --blue:#5c8df6;
+  --violet:#7a6ff0;
+  --teal:#22b8cf;
+
+  --text:#222;
+  --muted:#667;
+  --card:#fff;
+  --border:#eee;
+
+  --shadow:0 6px 16px rgba(0,0,0,.05);
+}
+
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family: Inter, system-ui, Arial, sans-serif;
+  background: var(--pink);
+  color: var(--text);
+}
+a{ color:inherit; text-decoration:none }
+
+/* ---------- Top bar / nav ---------- */
+.topbar{ background:#fff; border-bottom:1px solid var(--border); }
+.topbar .container{ display:flex; align-items:center; gap:16px; }
+.brand{ font-weight:800; font-size:22px; color:var(--text); }
+.menu{ display:flex; gap:12px; margin-left:auto; }
+.menu a{ padding:8px 10px; border-radius:10px; }
+.menu a.active{ background:#ffd16622; border:1px solid #ffd166; }
+
+/* ---------- Layout helpers ---------- */
+.container{ max-width:1100px; margin:0 auto; padding:24px; }
+.row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:20px;
+  margin:16px 0;
+  display:grid;
+  gap:16px;
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+  border:none; padding:10px 14px; border-radius:12px;
+  cursor:pointer; font-weight:600; line-height:1;
+}
+.btn-primary{ background:var(--pink-strong); color:#fff; }
+.btn-outline{ background:#fff; border:2px solid var(--pink-strong); color:var(--pink-strong); }
+.btn-warning{ background:var(--yellow); }
+.btn-danger{ background:#ff6b6b; color:#fff; }
+.btn-small{ padding:6px 10px; border-radius:10px; }
+
+/* ---------- Forms ---------- */
+label{ display:grid; gap:6px; font-size:14px; color:var(--muted); }
+input,select{
+  padding:12px; border:1px solid var(--border); border-radius:12px; background:#fff;
+}
+
+/* ---------- Table ---------- */
+.table-wrapper{ background:#fff; border:1px solid var(--border); border-radius:16px; padding:8px; }
+.table{ width:100%; border-collapse:collapse; }
+.table th,.table td{ padding:12px; border-bottom:1px solid var(--border); }
+.table .right{ text-align:right; }
+.table .actions{ display:flex; gap:8px; }
+
+/* ---------- Pills (category chips) ---------- */
+.pill{
+  background:linear-gradient(90deg,var(--blue),var(--green));
+  color:#fff; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600;
+}
+/* Optional category tints (use className="pill pill--Food" etc.) */
+.pill--Food{ background:linear-gradient(90deg,#ffb703,#ffd24d); }
+.pill--Shopping{ background:linear-gradient(90deg,#7a6ff0,#b197fc); }
+.pill--Transport{ background:linear-gradient(90deg,#5c8df6,#89b4ff); }
+.pill--Education{ background:linear-gradient(90deg,#22b8cf,#8be0be); }
+.pill--Health{ background:linear-gradient(90deg,#ff6b6b,#ffa8a8); }
+.pill--Other{ background:linear-gradient(90deg,#adb5bd,#ced4da); }
+
+/* ---------- Messages ---------- */
+.error{ color:#c00; font-weight:600; }
+
+/* ---------- KPIs (Dashboard) ---------- */
+.kpis{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap:16px;
+  margin-bottom:16px;
+}
+.kpi{ display:grid; gap:6px; }
+.kpi-label{ color:var(--muted); font-weight:600; }
+.kpi-value{ font-size:28px; font-weight:800; }
+.kpi-sub{ color:var(--muted); font-size:12px; }
+
+/* ---------- Charts area (wrap your Pie & Line in these) ---------- */
+.charts{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+}
+.chart-card{ min-height:380px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px){
+  .charts{ grid-template-columns: 1fr; }
+  .kpis{ grid-template-columns: 1fr; }
+}
