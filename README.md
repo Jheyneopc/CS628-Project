@@ -51,3 +51,5 @@ AI-based categorization
 Authentication (JWT)
 
 Budget alerts and exports
+
+**Note:** To run the application, start both the backend and frontend with npm run dev in their respective folders.
